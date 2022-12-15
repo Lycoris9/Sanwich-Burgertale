@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="start()">
+<script>
+var player;
+var enemy1;
+var film1, film2, film3, film4, film5, film6, film7, film8, film9, film10, film11, film12, film13, film14, film15, film16;
+let film = [film1, film2, film3, film4, film5, film6, film7, film8, film9, film10, film11, film12, film13, film14, film15, film16];
+var glitch1, glitch2, glitch3, glitch4, glitch5, glitch6, glitch7, glitch8, glitch9, glitch10, glitch11, glitch12, glitch13, glitch14, glitch15, glitch16, glitch17, glitch18, glitch19, glitch20, glitch21, glitch22, glitch23, glitch24, glitch25, glitch26, glitch27, glitch28, glitch29, glitch30, glitch31, glitch32, glitch33, glitch34, glitch35, glitch36, glitch37, glitch38, glitch39, glitch40;
+let glitch = [glitch1, glitch2, glitch3, glitch4, glitch5, glitch6, glitch7, glitch8, glitch9, glitch10, glitch11, glitch12, glitch13, glitch14, glitch15, glitch16, glitch17, glitch18, glitch19, glitch20, glitch21, glitch22, glitch23, glitch24, glitch25, glitch26, glitch27, glitch28, glitch29, glitch30, glitch31, glitch32, glitch33, glitch34, glitch35, glitch36, glitch37, glitch38, glitch39, glitch40]
+var superReady=0;
+var enemy1health1=20;
+var cutscene = false;
+var dead = false;
+var enemyFireTimer = 0;
+var dialogueAdvanceTimer = 0;
+var backgroundPlaceholder1, backgroundPlaceholder2, backgroundPlaceholder3;
+var textbox;
+var dialogue = 1;
+var text = 1;
+var flen = film.length
+var glen = glitch.length
+var area = 2;
+
+function start() {
+    gameSpace.start();
+    textbox = new entity(440, 100, "gray", 100, 350)
+    backgroundPlaceholder1 = new entity(640, 480, "red", 0, 0)
+    backgroundPlaceholder2 = new entity(640, 480, "blue", 0, 0)
+    backgroundPlaceholder3 = new entity(640, 480, "yellow", 0, 0)    
+    player = new entity(28, 48, "mc.png", 10, 110, "image");
+    enemy1 = new entity(28, 48, "enemy1.png", 400, 162, "image")
+    for (let i = 0; i < flen; i++) {
+      film[i] = new entity(8, 8, "film.png", 10, 120, "image");
+    }
+    for (let i = 0; i < glen; i++) {
+      glitch[i] = new entity(8, 8, "glitch.png", 400, 162, "image")
+    }
+}
+var gameSpace = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 640;
+        this.canvas.height = 480;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameSpace, 20);
+        let healthbar = document.getElementById("healthbar")
+        window.addEventListener('keydown', function (e) {
+            gameSpace.keys = (gameSpace.keys || []);
+            gameSpace.keys[e.keyCode] = (e.type == "keydown");
+        })
+        window.addEventListener('keyup', function (e) {
+            gameSpace.keys[e.keyCode] = (e.type == "keydown");
+        window.addEventListener('mouseDown', mouseDown);
+        })
+        window.addEventListener('mouseMove', function(e){
+          mousePos.x = e.layerX;
+          mousePos.y = e.layerY;
+        }); 
+    }, 
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+function entity(width, height, color, x, y, type) {
+    this.type = type;
+    if (type == "image") {
+        this.image = new Image();
+        this.image.src = color;
+    }
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;
+    this.angle=0    
+    this.update = function() {
+        ctx = gameSpace.context;
+        if (type == "image") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }
+}
+var ctx = document.getElementById('canvas').getContext('2d');
+
+function updateGameSpace() {
+  if (cutscene == true) {
+    gameSpace.clear();
+    if (area == 1) {
+      backgroundPlaceholder1.newPos();
+      backgroundPlaceholder1.update();
+    }
+    if (area == 2) {
+      backgroundPlaceholder2.newPos();
+      backgroundPlaceholder2.update();
+    }
+    if (area == 3) {
+      backgroundPlaceholder3.newPos();
+      backgroundPlaceholder3.update();
+    }
+    if (dialogue == 1) {
+      dialogueAdvanceTimer += 1  
+      textbox.newPos();
+      textbox.update();
+      ctx.font = '20px serif';
+      ctx.fillStyle = "black";
+      if (text == 1) {  
+        ctx.fillText('Another day... Huh.', 120, 380);
+      }
+      if (text == 2) {
+        ctx.fillText('Time to get started I guess.', 120, 380);
+      }
+      if (text == 3) {
+        dialogue = 2;
+        text = 1;
+        cutscene = false;
+      }
+      if (gameSpace.keys && gameSpace.keys[32] && dialogueAdvanceTimer >= 50) {
+        text += 1
+        dialogueAdvanceTimer = 0
+      }
+    }
+    if (dialogue == 2) {
+      dialogueAdvanceTimer += 1  
+      textbox.newPos();
+      textbox.update();
+      ctx.font = '20px serif';
+      ctx.fillStyle = "black";
+      if (text == 1) {
+        ctx.fillText('I have a roommate, she lives over there with her boyfriend.', 120, 380);
+      }
+      if (text == 2) {
+        dialogue = 3
+        text = 1
+        cutscene = false
+      }
+      if (gameSpace.keys && gameSpace.keys[32] && dialogueAdvanceTimer >= 50) {
+        text += 1
+        dialogueAdvanceTimer = 0      
+      }      
+    }      
+  }  
+  if (cutscene == false) {
+    gameSpace.clear();
+    if (area == 1) {
+      backgroundPlaceholder1.newPos();
+      backgroundPlaceholder1.update();
+      if (player.y == 432) {
+        area = 2
+        player.y = 20
+      }
+    }
+    if (area == 2) {
+      backgroundPlaceholder2.newPos();
+      backgroundPlaceholder2.update();
+      if (dialogue == 2) {
+        cutscene = true
+      }  
+      if (player.y == 0) {
+        area = 1
+        player.y = 420
+      }
+      if (player.y == 432) {
+        area = 3
+        player.y = 20
+      }
+    } 
+    if (area == 3) {
+      backgroundPlaceholder3.newPos();
+      backgroundPlaceholder3.update();
+      if (player.y == 0) {
+        area = 2
+        player.y = 420
+      }
+    }     
+    if (healthbar.value == 0) {dead=true}
+    if (dead == false){  
+      player.speedX = 0;
+      player.speedY = 0;
+      enemy1.speedX = 0;
+      enemy1.speedY = 0;
+      superReady -= 1;
+      if (gameSpace.keys && gameSpace.keys[39]) {film[0].speedX = 10;}
+      if (gameSpace.keys && gameSpace.keys[40]) {film[1].speedY = 10;}
+      if (gameSpace.keys && gameSpace.keys[37]) {film[2].speedX = -10;}
+      if (gameSpace.keys && gameSpace.keys[38]) {film[3].speedY = -10;}
+      if (gameSpace.keys && gameSpace.keys[39] && gameSpace.keys[40]) {film[4].speedX = 10; film[4].speedY = 10;}
+      if (gameSpace.keys && gameSpace.keys[37] && gameSpace.keys[40]) {film[5].speedX = -10; film[5].speedY = 10;}    
+      if (gameSpace.keys && gameSpace.keys[39] && gameSpace.keys[38]) {film[6].speedX = 10; film[6].speedY = -10;}    
+      if (gameSpace.keys && gameSpace.keys[37] && gameSpace.keys[38]) {film[7].speedX = -10; film[7].speedY = -10;}                   
+      if (superReady<=0 && gameSpace.keys && gameSpace.keys[32]) {superReady = 200;film[8].speedX = 10; film[9].speedX = -10; film[10].speedY = 10; film[11].speedY = -10; film[12].speedX = 10; film[12].speedY = 10; film[13].speedX = 10; film[13].speedY = -10; film[14].speedX = -10; film[14].speedY = 10; film[15].speedX = -10; film[15].speedY = -10; }   
+      if (superReady<=0) {document.getElementById("super").innerHTML = "Super Ready!";}
+      if (superReady>0) {document.getElementById("super").innerHTML = "Super Not Ready!";}
+
+      for (let i = 0; i < flen; i++) {
+        if (film[i].x>=640||film[i].x<=0||film[i].y>=480||film[i].y<=0) {film[i].x=player.x; film[i].y=player.y; film[i].speedX=0; film[i].speedY=0};
+        if (film[i].speedX==0 && film[i].speedY==0) {film[i].x=player.x+12; film[i].y=player.y+22};
+        if (film[i].x < enemy1.x + enemy1.width && film[i].x + film[i].width > enemy1.x && film[i].y < enemy1.y + enemy1.height && film[i].y + film[i].height > enemy1.y) {enemy1health1-=1; film[i].speedX = 0, film[i].speedY = 0, film[i].x = player.x+12, film[i].y = player.y+22};
+        film[i].newPos();
+        film[i].update();
+      }
+      if (player.x != 0) {  
+        if (gameSpace.keys && gameSpace.keys[65]) {player.speedX = -2; }
+      }  
+      if (player.x != 612) { 
+        if (gameSpace.keys && gameSpace.keys[68]) {player.speedX = 2; }
+      }
+      if (player.y != 0) {  
+        if (gameSpace.keys && gameSpace.keys[87]) {player.speedY = -2; }
+      }
+      if (player.y != 432) {
+        if (gameSpace.keys && gameSpace.keys[83]) {player.speedY = 2; }
+      }
+      if (enemy1health1<=0) {enemy1.x=-200; enemy1.y=-200}
+
+      enemyFireTimer+=1
+      if (enemy1health1>0 && area==2) {
+        if (enemyFireTimer==5) {glitch[0].speedX=10; glitch[0].speedY=0; glitch[20].speedX=-10; glitch[20].speedY=0;}
+        if (enemyFireTimer==10) {glitch[1].speedX=8; glitch[1].speedY=2; glitch[21].speedX=-8; glitch[21].speedY=-2}
+        if (enemyFireTimer==15) {glitch[2].speedX=6; glitch[2].speedY=4; glitch[22].speedX=-6; glitch[22].speedY=-4}
+        if (enemyFireTimer==20) {glitch[3].speedX=4; glitch[3].speedY=6; glitch[23].speedX=-4; glitch[23].speedY=-6}
+        if (enemyFireTimer==25) {glitch[4].speedX=2; glitch[4].speedY=8; glitch[24].speedX=-2; glitch[24].speedY=-8}
+        if (enemyFireTimer==30) {glitch[5].speedX=0; glitch[5].speedY=10; glitch[25].speedX=0; glitch[25].speedY=-10}
+        if (enemyFireTimer==35) {glitch[6].speedX=-2; glitch[6].speedY=8; glitch[26].speedX=2; glitch[26].speedY=-8}
+        if (enemyFireTimer==40) {glitch[7].speedX=-4; glitch[7].speedY=6; glitch[27].speedX=4; glitch[27].speedY=-6}
+        if (enemyFireTimer==45) {glitch[8].speedX=-6; glitch[8].speedY=4; glitch[28].speedX=6; glitch[28].speedY=-4}
+        if (enemyFireTimer==50) {glitch[9].speedX=-8; glitch[9].speedY=2; glitch[29].speedX=8; glitch[29].speedY=-2}
+        if (enemyFireTimer==55) {glitch[10].speedX=-10; glitch[10].speedY=0; glitch[30].speedX=10; glitch[30].speedY=0}
+        if (enemyFireTimer==60) {glitch[11].speedX=-8; glitch[11].speedY=-2; glitch[31].speedX=8; glitch[31].speedY=2}
+        if (enemyFireTimer==65) {glitch[12].speedX=-6; glitch[12].speedY=-4; glitch[32].speedX=6; glitch[32].speedY=4}
+        if (enemyFireTimer==70) {glitch[13].speedX=-4; glitch[13].speedY=-6; glitch[33].speedX=4; glitch[33].speedY=6}
+        if (enemyFireTimer==75) {glitch[14].speedX=-2; glitch[14].speedY=-8; glitch[34].speedX=2; glitch[34].speedY=8}
+        if (enemyFireTimer==80) {glitch[15].speedX=0; glitch[15].speedY=-10; glitch[35].speedX=0; glitch[35].speedY=10}
+        if (enemyFireTimer==85) {glitch[16].speedX=2; glitch[16].speedY=-8; glitch[36].speedX=-2; glitch[36].speedY=8}
+        if (enemyFireTimer==90) {glitch[17].speedX=4; glitch[17].speedY=-6; glitch[37].speedX=-4; glitch[37].speedY=6}
+        if (enemyFireTimer==95) {glitch[18].speedX=6; glitch[18].speedY=-4; glitch[38].speedX=-6; glitch[38].speedY=4}
+        if (enemyFireTimer==100) {glitch[19].speedX=8; glitch[19].speedY=-2; glitch[39].speedX=-8; glitch[39].speedY=2; enemyFireTimer=0}
+        if (enemy1.x != 262 && enemy1.y == 162) {
+          enemy1.speedX = -3;
+          enemy1.speedY = 0;
+        }
+        if (enemy1.x == 262 && enemy1.y != 222) {
+          enemy1.speedX = 0;
+          enemy1.speedY = 3;      
+        }
+        if (enemy1.x != 322 && enemy1.y == 222) {
+          enemy1.speedX = 3;
+          enemy1.speedY = 0;      
+        }
+        if (enemy1.x == 322 && enemy1.y != 162) {
+          enemy1.speedX = 0;
+          enemy1.speedY = -3;      
+        }
+        for (let i = 0; i < glen; i++) {
+          if (glitch[i].x>=640||glitch[i].x<=0||glitch[i].y>=480||glitch[i].y<=0) {glitch[i].x=enemy1.x; glitch[i].y=enemy1.y; glitch[i].speedX=0; glitch[i].speedY=0}
+          if (glitch[i].x < player.x + player.width && glitch[i].x + glitch[i].width > player.x && glitch[i].y < player.y + player.height && glitch[i].y + glitch[i].height > player.y) {healthbar.value-=1; glitch[i].speedX = 0, glitch[i].speedY = 0, glitch[i].x = enemy1.x+12, glitch[i].y = enemy1.y+22}
+          if (glitch[i].speedX==0 && glitch[i].speedY==0) {glitch[i].x=enemy1.x+12; glitch[i].y=enemy1.y+22}glitch[i].newPos();
+          glitch[i].update();    
+        }
+        if (enemy1health1>0) {
+          if (player.x < enemy1.x + enemy1.width && player.x + player.width > enemy1.x && player.y < enemy1.y + enemy1.height && player.y + player.height > enemy1.y) {healthbar.value-=1}; enemy1.newPos(); enemy1.update();
+        }
+      }  
+      player.newPos();    
+      player.update();
+    } 
+  }
+}
+</script>
+<div>
+<label for="healthbar">Player Health</label>  
+<progress id="healthbar" value="10" max="10"></progress>
+<p id="super">Super Ready!</p>
+</div>
+<div>
+<button type="button" onclick = "location.href='index.html'" type="button">back</button>
+</div>
+</body>
+</html>
